@@ -43,9 +43,6 @@ namespace Grammophone.Domos.Tests.Music.DataAccess.EntityFrameworkCore
 		{
 			base.OnModelCreating(modelBuilder);
 
-			modelBuilder.Ignore<BrowserSession>();
-			modelBuilder.Ignore<ClientIpAddress>();
-			modelBuilder.Ignore<WebAuthnCredential>();
 			modelBuilder.Entity<StateGroup>().HasOne(sg => sg.WorkflowGraph).WithMany(wg => wg.StateGroups).HasForeignKey(sg => sg.WorkflowGraphID).OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<State>().HasOne(s => s.Group).WithMany(sg => sg.States).HasForeignKey(s => s.GroupID).OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<StatePath>().HasOne(sp => sp.WorkflowGraph).WithMany().HasForeignKey(sp => sp.WorkflowGraphID).OnDelete(DeleteBehavior.NoAction);
