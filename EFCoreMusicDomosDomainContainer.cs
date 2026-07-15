@@ -86,8 +86,6 @@ namespace Grammophone.Domos.Tests.Music.DataAccess.EntityFrameworkCore
 			modelBuilder.Entity<AlbumStateTransition>().HasOne(st => st.CreatorUser).WithMany().HasForeignKey(st => st.CreatorUserID).OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<AlbumStateTransition>().HasOne(st => st.LastModifierUser).WithMany().HasForeignKey(st => st.LastModifierUserID).OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<AlbumStateTransition>().HasOne(st => st.Path).WithMany().HasForeignKey(st => st.PathID).OnDelete(DeleteBehavior.NoAction);
-			modelBuilder.Entity<AlbumStateTransition>().Ignore(st => st.FundsTransferEventID);
-			modelBuilder.Entity<AlbumStateTransition>().Ignore(st => st.FundsTransferEvent);
 		}
 	}
 }
