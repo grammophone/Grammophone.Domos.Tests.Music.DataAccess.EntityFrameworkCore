@@ -37,11 +37,33 @@ namespace Grammophone.Domos.Tests.Music.DataAccess.EntityFrameworkCore
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
 			// The music tests do not require EF Core lazy-loading or change-tracking proxies.
+
+			base.OnConfiguring(optionsBuilder);
+
+			optionsBuilder.UseChangeTrackingProxies();
 		}
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
+
+			// Disposition uses UserTrackingEntityWithID<User, long> so its navigation
+			// properties (OwningUser, CreatorUser, LastModifierUser) are typed as User.
+			// The base class (EFCoreUsersDomainContainer<U>.OnModelCreating) already maps
+			// these via the string-based API using typeof(U) — but omits OnDelete for
+			// CreatorUser and LastModifierUser.  EF Core defaults required FKs (long) to
+			// Cascade, and SQL Server rejects three cascade paths to Users on Dispositions.
+			// Override CreatorUser and LastModifierUser to NoAction to match EF6 behavior.
+			modelBuilder.Entity<Disposition>()
+				.HasOne(typeof(MusicUser), nameof(Disposition.CreatorUser))
+				.WithMany()
+				.HasForeignKey(nameof(Disposition.CreatorUserID))
+				.OnDelete(DeleteBehavior.NoAction);
+			modelBuilder.Entity<Disposition>()
+				.HasOne(typeof(MusicUser), nameof(Disposition.LastModifierUser))
+				.WithMany()
+				.HasForeignKey(nameof(Disposition.LastModifierUserID))
+				.OnDelete(DeleteBehavior.NoAction);
 
 			modelBuilder.Entity<StateGroup>().HasOne(sg => sg.WorkflowGraph).WithMany(wg => wg.StateGroups).HasForeignKey(sg => sg.WorkflowGraphID).OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<State>().HasOne(s => s.Group).WithMany(sg => sg.States).HasForeignKey(s => s.GroupID).OnDelete(DeleteBehavior.NoAction);
@@ -60,10 +82,6 @@ namespace Grammophone.Domos.Tests.Music.DataAccess.EntityFrameworkCore
 				.WithMany()
 				.HasForeignKey(d => d.RecordLabelID)
 				.OnDelete(DeleteBehavior.NoAction);
-
-			modelBuilder.Entity<Disposition>().HasOne(d => d.OwningUser).WithMany(u => u.Dispositions).HasForeignKey(d => d.OwningUserID).OnDelete(DeleteBehavior.Cascade);
-			modelBuilder.Entity<Disposition>().HasOne(d => d.CreatorUser).WithMany().HasForeignKey(d => d.CreatorUserID).OnDelete(DeleteBehavior.NoAction);
-			modelBuilder.Entity<Disposition>().HasOne(d => d.LastModifierUser).WithMany().HasForeignKey(d => d.LastModifierUserID).OnDelete(DeleteBehavior.NoAction);
 
 			modelBuilder.Entity<Artist>().Property(a => a.Name).IsRequired().HasMaxLength(200);
 			modelBuilder.Entity<Artist>().HasOne(a => a.RecordLabel).WithMany().HasForeignKey(a => a.RecordLabelID).OnDelete(DeleteBehavior.NoAction);
