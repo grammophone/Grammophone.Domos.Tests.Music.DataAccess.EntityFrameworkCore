@@ -12,13 +12,13 @@ namespace Grammophone.Domos.Tests.Music.DataAccess.EntityFrameworkCore
 	/// </summary>
 	public class EFCoreMusicDomosDomainContainer : EFCoreWorkflowUsersDomainContainer<MusicUser, AlbumStateTransition>
 	{
-		public EFCoreMusicDomosDomainContainer(DbContextOptions options, bool useChangeTracking = true)
-			: base(options, useChangeTracking)
+		public EFCoreMusicDomosDomainContainer(DbContextOptions options)
+			: base(options)
 		{
 		}
 
-		public EFCoreMusicDomosDomainContainer(DbContextOptions options, TransactionMode transactionMode, bool useChangeTracking = true)
-			: base(options, transactionMode, useChangeTracking)
+		public EFCoreMusicDomosDomainContainer(DbContextOptions options, TransactionMode transactionMode)
+			: base(options, transactionMode)
 		{
 		}
 
