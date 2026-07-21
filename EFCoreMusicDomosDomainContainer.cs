@@ -4,12 +4,10 @@ using Grammophone.Domos.Domain;
 using Grammophone.Domos.Domain.Workflow;
 using Grammophone.Domos.Tests.Music.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Grammophone.Domos.Tests.Music.DataAccess.EntityFrameworkCore
 {
-	/// <summary>
-	/// EF Core music Domos test container.
-	/// </summary>
 	public class EFCoreMusicDomosDomainContainer : EFCoreWorkflowUsersDomainContainer<MusicUser, AlbumStateTransition>
 	{
 		public EFCoreMusicDomosDomainContainer(DbContextOptions options)
@@ -36,8 +34,6 @@ namespace Grammophone.Domos.Tests.Music.DataAccess.EntityFrameworkCore
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
-			// The music tests do not require EF Core lazy-loading or change-tracking proxies.
-
 			base.OnConfiguring(optionsBuilder);
 
 			optionsBuilder.UseChangeTrackingProxies();
@@ -45,25 +41,9 @@ namespace Grammophone.Domos.Tests.Music.DataAccess.EntityFrameworkCore
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			base.OnModelCreating(modelBuilder);
+			modelBuilder.HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangingAndChangedNotificationsWithOriginalValues);
 
-			// Disposition uses UserTrackingEntityWithID<User, long> so its navigation
-			// properties (OwningUser, CreatorUser, LastModifierUser) are typed as User.
-			// The base class (EFCoreUsersDomainContainer<U>.OnModelCreating) already maps
-			// these via the string-based API using typeof(U) — but omits OnDelete for
-			// CreatorUser and LastModifierUser.  EF Core defaults required FKs (long) to
-			// Cascade, and SQL Server rejects three cascade paths to Users on Dispositions.
-			// Override CreatorUser and LastModifierUser to NoAction to match EF6 behavior.
-			modelBuilder.Entity<Disposition>()
-				.HasOne(typeof(MusicUser), nameof(Disposition.CreatorUser))
-				.WithMany()
-				.HasForeignKey(nameof(Disposition.CreatorUserID))
-				.OnDelete(DeleteBehavior.NoAction);
-			modelBuilder.Entity<Disposition>()
-				.HasOne(typeof(MusicUser), nameof(Disposition.LastModifierUser))
-				.WithMany()
-				.HasForeignKey(nameof(Disposition.LastModifierUserID))
-				.OnDelete(DeleteBehavior.NoAction);
+			base.OnModelCreating(modelBuilder);
 
 			modelBuilder.Entity<StateGroup>().HasOne(sg => sg.WorkflowGraph).WithMany(wg => wg.StateGroups).HasForeignKey(sg => sg.WorkflowGraphID).OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<State>().HasOne(s => s.Group).WithMany(sg => sg.States).HasForeignKey(s => s.GroupID).OnDelete(DeleteBehavior.NoAction);
