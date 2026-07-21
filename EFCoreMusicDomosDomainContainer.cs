@@ -1,4 +1,5 @@
 using Grammophone.DataAccess;
+using Grammophone.DataAccess.EntityFrameworkCore;
 using Grammophone.Domos.DataAccess.EntityFrameworkCore;
 using Grammophone.Domos.Domain;
 using Grammophone.Domos.Domain.Workflow;
@@ -36,12 +37,14 @@ namespace Grammophone.Domos.Tests.Music.DataAccess.EntityFrameworkCore
 		{
 			base.OnConfiguring(optionsBuilder);
 
-			//optionsBuilder.UseChangeTrackingProxies();
+			optionsBuilder.UseChangeTrackingProxies();
+
+			optionsBuilder.UseFlexibleChangeTracking();
 		}
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			//modelBuilder.HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangingAndChangedNotificationsWithOriginalValues);
+			modelBuilder.HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangingAndChangedNotificationsWithOriginalValues);
 
 			base.OnModelCreating(modelBuilder);
 
