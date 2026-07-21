@@ -36,12 +36,12 @@ namespace Grammophone.Domos.Tests.Music.DataAccess.EntityFrameworkCore
 		{
 			base.OnConfiguring(optionsBuilder);
 
-			optionsBuilder.UseChangeTrackingProxies();
+			//optionsBuilder.UseChangeTrackingProxies();
 		}
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			modelBuilder.HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangingAndChangedNotificationsWithOriginalValues);
+			//modelBuilder.HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangingAndChangedNotificationsWithOriginalValues);
 
 			base.OnModelCreating(modelBuilder);
 
@@ -53,8 +53,6 @@ namespace Grammophone.Domos.Tests.Music.DataAccess.EntityFrameworkCore
 
 			modelBuilder.Entity<RecordLabel>().Property(l => l.Name).IsRequired().HasMaxLength(200);
 			modelBuilder.Entity<RecordLabel>().HasIndex(l => l.Name).IsUnique();
-			modelBuilder.Entity<RecordLabel>().HasOne(l => l.CreatorUser).WithMany().HasForeignKey(l => l.CreatorUserID).OnDelete(DeleteBehavior.NoAction);
-			modelBuilder.Entity<RecordLabel>().HasOne(l => l.LastModifierUser).WithMany().HasForeignKey(l => l.LastModifierUserID).OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<RecordLabel>().HasOne(l => l.OwningUser).WithMany().HasForeignKey(l => l.OwningUserID).OnDelete(DeleteBehavior.NoAction);
 
 			modelBuilder.Entity<RecordLabelDisposition>()
@@ -81,9 +79,9 @@ namespace Grammophone.Domos.Tests.Music.DataAccess.EntityFrameworkCore
 			modelBuilder.Entity<Track>().HasOne(t => t.Owner).WithMany().HasForeignKey(t => t.OwnerID).OnDelete(DeleteBehavior.NoAction);
 
 			modelBuilder.Entity<AlbumStateTransition>().HasOne(st => st.Album).WithMany(a => a.StateTransitions).HasForeignKey(st => st.AlbumID).OnDelete(DeleteBehavior.NoAction);
-			modelBuilder.Entity<AlbumStateTransition>().HasOne(st => st.CreatorUser).WithMany().HasForeignKey(st => st.CreatorUserID).OnDelete(DeleteBehavior.NoAction);
-			modelBuilder.Entity<AlbumStateTransition>().HasOne(st => st.LastModifierUser).WithMany().HasForeignKey(st => st.LastModifierUserID).OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<AlbumStateTransition>().HasOne(st => st.Path).WithMany().HasForeignKey(st => st.PathID).OnDelete(DeleteBehavior.NoAction);
+
+			ConfigureAllTrackingEntitiesNavigations<MusicUser>(modelBuilder);
 		}
 	}
 }
