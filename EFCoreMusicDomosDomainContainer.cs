@@ -1,12 +1,10 @@
 using Grammophone.DataAccess;
 using Grammophone.DataAccess.EntityFrameworkCore;
-using Grammophone.DataAccess.EntityFrameworkCore.Infrastructure;
 using Grammophone.Domos.DataAccess.EntityFrameworkCore;
 using Grammophone.Domos.Domain;
 using Grammophone.Domos.Domain.Workflow;
 using Grammophone.Domos.Tests.Music.Domain;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Grammophone.Domos.Tests.Music.DataAccess.EntityFrameworkCore
 {
